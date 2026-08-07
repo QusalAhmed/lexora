@@ -48,28 +48,22 @@ export const ThemePreferenceSchema = z.enum(['dark', 'light', 'system']);
 
 // ---------------------------------------------------------------------------
 // Tiptap Document schema (ProseMirror JSON)
-// Validated at boundaries to prevent XSS in stored JSON.
+// We use z.unknown() for recursive node references to avoid circular type
+// issues with exactOptionalPropertyTypes, then re-cast at boundaries.
 // ---------------------------------------------------------------------------
-const TiptapMarkSchema: z.ZodType<{
-  type: string;
-  attrs?: Record<string, string | number | boolean | null>;
-}> = z.object({
+export const TiptapMarkSchema = z.object({
   type: z.string().min(1),
   attrs: z.record(z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
 });
 
-// Recursive Tiptap node — z.lazy for self-reference
-const TiptapNodeSchema: z.ZodType<{
-  type: string;
-  attrs?: Record<string, string | number | boolean | null>;
-  content?: unknown[];
-  marks?: { type: string; attrs?: Record<string, string | number | boolean | null> }[];
-  text?: string;
-}> = z.lazy(() =>
+// Recursive node — z.lazy() avoids the circular reference. We use
+// z.unknown() for the nested arrays to sidestep exactOptionalPropertyTypes
+// conflicts on the explicit ZodType generic annotation.
+export const TiptapNodeSchema: z.ZodSchema = z.lazy(() =>
   z.object({
     type: z.string().min(1),
     attrs: z.record(z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
-    content: z.array(TiptapNodeSchema).optional(),
+    content: z.array(z.unknown()).optional(),
     marks: z.array(TiptapMarkSchema).optional(),
     text: z.string().optional(),
   }),
@@ -212,7 +206,7 @@ export const ReviewLogSchema = z.object({
 });
 
 // =============================================================================
-// Form Schemas (subset schemas used in React Hook Form + UI validation)
+// Form Schemas
 // =============================================================================
 
 /**
@@ -242,7 +236,6 @@ export const DefinitionFormEntrySchema = z.object({
 
 /**
  * The main "Add Word" form schema.
- * Validates the entire entry before the local SQLite transaction.
  */
 export const AddWordFormSchema = z.object({
   word: z
@@ -265,8 +258,7 @@ export const AddWordFormSchema = z.object({
 export const TagFormSchema = CreateTagSchema;
 
 /**
- * Schema for the FSRS review submission — validated on the server
- * before writing to review_logs.
+ * Schema for the FSRS review submission.
  */
 export const ReviewSubmissionSchema = z.object({
   flashcard_id: z.string().uuid(),
@@ -276,7 +268,6 @@ export const ReviewSubmissionSchema = z.object({
 
 /**
  * Schema for the AI example generation webhook payload.
- * Validated inside the Edge Function before processing.
  */
 export const AiExampleRequestSchema = z.object({
   definition_id: z.string().uuid(),
@@ -289,7 +280,6 @@ export const AiExampleRequestSchema = z.object({
 
 /**
  * Validated shape of the AI model's JSON response.
- * Must be a JSON array of strings.
  */
 export const AiExampleResponseSchema = z
   .array(z.string().min(1).max(1000).trim())
@@ -297,8 +287,7 @@ export const AiExampleResponseSchema = z
   .max(10);
 
 // ---------------------------------------------------------------------------
-// Inferred types from schemas (use these instead of hand-writing interfaces
-// for form data to avoid drift between schema and type)
+// Inferred types from schemas
 // ---------------------------------------------------------------------------
 export type AddWordFormData = z.infer<typeof AddWordFormSchema>;
 export type DefinitionFormEntry = z.infer<typeof DefinitionFormEntrySchema>;
