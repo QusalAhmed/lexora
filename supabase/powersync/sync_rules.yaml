@@ -1,0 +1,80 @@
+# =============================================================================
+# supabase/powersync/sync_rules.yaml
+# PowerSync Sync Rules — defines which server data is synced to each user's
+# local SQLite database.
+#
+# Security model:
+#   - Each user syncs ONLY their own rows (user_id = request.user_id)
+#   - Soft-deleted rows ARE synced so the client can process deletions
+#   - review_logs are synced so offline reviews upload correctly
+# =============================================================================
+
+bucket_definitions:
+
+  # ---------------------------------------------------------------------------
+  # Bucket: user_profile
+  # Syncs the authenticated user's own profile row.
+  # ---------------------------------------------------------------------------
+  user_profile:
+    parameters:
+      - name: user_id
+        token_parameter: user_id
+    data:
+      - table: users
+        where: id = bucket.user_id
+
+  # ---------------------------------------------------------------------------
+  # Bucket: user_vocabulary
+  # Core vocabulary data: words, definitions, examples, tags, word_tags.
+  # ---------------------------------------------------------------------------
+  user_vocabulary:
+    parameters:
+      - name: user_id
+        token_parameter: user_id
+    data:
+      - table: words
+        where: user_id = bucket.user_id
+
+      - table: definitions
+        where: user_id = bucket.user_id
+
+      - table: examples
+        where: user_id = bucket.user_id
+
+      - table: tags
+        where: user_id = bucket.user_id
+
+      # word_tags: join through words to enforce ownership
+      - table: word_tags
+        where: >
+          word_id IN (
+            SELECT id FROM words WHERE user_id = bucket.user_id
+          )
+
+  # ---------------------------------------------------------------------------
+  # Bucket: user_flashcards
+  # All flashcards for the authenticated user.
+  # Split from vocabulary so the review engine can sync independently.
+  # ---------------------------------------------------------------------------
+  user_flashcards:
+    parameters:
+      - name: user_id
+        token_parameter: user_id
+    data:
+      - table: flashcards
+        where: user_id = bucket.user_id
+
+  # ---------------------------------------------------------------------------
+  # Bucket: user_review_logs
+  # Review history — synced bidirectionally so offline reviews are uploaded.
+  # Limit to last 90 days to keep local DB manageable.
+  # ---------------------------------------------------------------------------
+  user_review_logs:
+    parameters:
+      - name: user_id
+        token_parameter: user_id
+    data:
+      - table: review_logs
+        where: >
+          user_id = bucket.user_id
+          AND review_time >= NOW() - INTERVAL '90 days'
