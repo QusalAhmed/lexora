@@ -1,1 +1,314 @@
+/* ============================================================================
+   src/app/globals.css
+   Lexora Design System — Dark-first, premium vocabulary PWA.
+
+   Token naming convention: --lexora-{category}-{variant}
+   ============================================================================ */
+
 @import "tailwindcss";
+
+/* Mantine core styles */
+@import "@mantine/core/styles.css";
+@import "@mantine/notifications/styles.css";
+
+/* ============================================================================
+   Google Fonts (self-hosted by Next.js at build time — safe with COEP)
+   Import is handled via next/font in layout.tsx, these are just fallbacks.
+   ============================================================================ */
+
+/* ============================================================================
+   Design Tokens
+   ============================================================================ */
+:root {
+  /* Background scale */
+  --lexora-bg-base:     #07060e;
+  --lexora-bg-surface:  #0d0c18;
+  --lexora-bg-elevated: #121122;
+  --lexora-bg-overlay:  #181730;
+
+  /* Border */
+  --lexora-border-subtle:  rgba(99, 102, 241, 0.12);
+  --lexora-border-default: rgba(99, 102, 241, 0.22);
+  --lexora-border-strong:  rgba(99, 102, 241, 0.40);
+
+  /* Primary — Indigo/Violet */
+  --lexora-primary-50:  #eef2ff;
+  --lexora-primary-100: #e0e7ff;
+  --lexora-primary-200: #c7d2fe;
+  --lexora-primary-300: #a5b4fc;
+  --lexora-primary-400: #818cf8;
+  --lexora-primary-500: #6366f1;
+  --lexora-primary-600: #4f46e5;
+  --lexora-primary-700: #4338ca;
+  --lexora-primary-800: #3730a3;
+  --lexora-primary-900: #312e81;
+
+  /* Accent — Teal */
+  --lexora-accent-300: #5eead4;
+  --lexora-accent-400: #2dd4bf;
+  --lexora-accent-500: #14b8a6;
+
+  /* Semantic */
+  --lexora-success: #10b981;
+  --lexora-warning: #f59e0b;
+  --lexora-danger:  #ef4444;
+  --lexora-info:    #38bdf8;
+
+  /* Text scale */
+  --lexora-text-primary:   #f0eeff;
+  --lexora-text-secondary: #9b96be;
+  --lexora-text-muted:     #514e70;
+  --lexora-text-disabled:  #332f55;
+
+  /* Typography */
+  --lexora-font-sans: var(--font-inter, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif);
+  --lexora-font-mono: var(--font-fira, 'Fira Code', 'Cascadia Code', 'JetBrains Mono', ui-monospace, monospace);
+
+  /* Spacing */
+  --lexora-sidebar-width: 240px;
+  --lexora-header-height: 60px;
+
+  /* Shadows */
+  --lexora-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --lexora-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --lexora-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.5);
+  --lexora-shadow-glow: 0 0 24px rgba(99, 102, 241, 0.25);
+
+  /* Radii */
+  --lexora-radius-sm: 6px;
+  --lexora-radius-md: 10px;
+  --lexora-radius-lg: 16px;
+  --lexora-radius-xl: 24px;
+
+  /* Transitions */
+  --lexora-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --lexora-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --lexora-duration-fast: 120ms;
+  --lexora-duration-normal: 200ms;
+  --lexora-duration-slow: 350ms;
+}
+
+/* ============================================================================
+   Base Reset & Global Styles
+   ============================================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background-color: var(--lexora-bg-base);
+  color: var(--lexora-text-primary);
+  font-family: var(--lexora-font-sans);
+  line-height: 1.6;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--lexora-border-default);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--lexora-border-strong);
+}
+
+/* Selection */
+::selection {
+  background: rgba(99, 102, 241, 0.35);
+  color: var(--lexora-text-primary);
+}
+
+/* Focus rings */
+:focus-visible {
+  outline: 2px solid var(--lexora-primary-500);
+  outline-offset: 2px;
+  border-radius: var(--lexora-radius-sm);
+}
+
+/* ============================================================================
+   Mantine Theme Overrides — Map Mantine CSS vars to our design tokens
+   ============================================================================ */
+[data-mantine-color-scheme="dark"] {
+  --mantine-color-body:          var(--lexora-bg-base);
+  --mantine-color-dark-6:        var(--lexora-bg-surface);
+  --mantine-color-dark-7:        var(--lexora-bg-elevated);
+  --mantine-color-dark-4:        var(--lexora-border-default);
+  --mantine-color-text:          var(--lexora-text-primary);
+  --mantine-color-dimmed:        var(--lexora-text-secondary);
+  --mantine-color-default-color: var(--lexora-text-primary);
+  --mantine-color-placeholder:   var(--lexora-text-muted);
+
+  /* Inputs */
+  --mantine-color-default:        var(--lexora-bg-surface);
+  --mantine-color-default-border: var(--lexora-border-default);
+  --mantine-color-default-hover:  var(--lexora-bg-elevated);
+
+  /* Radius */
+  --mantine-radius-sm: var(--lexora-radius-sm);
+  --mantine-radius-md: var(--lexora-radius-md);
+  --mantine-radius-lg: var(--lexora-radius-lg);
+
+  /* Font */
+  --mantine-font-family: var(--lexora-font-sans);
+  --mantine-font-family-monospace: var(--lexora-font-mono);
+}
+
+/* ============================================================================
+   Glassmorphism utility classes
+   ============================================================================ */
+.glass {
+  background: rgba(13, 12, 24, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--lexora-border-subtle);
+}
+
+.glass-elevated {
+  background: rgba(18, 17, 34, 0.8);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid var(--lexora-border-default);
+}
+
+/* ============================================================================
+   Animated gradient background (used on auth pages)
+   ============================================================================ */
+.animated-gradient-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-gradient-bg::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(124, 58, 237, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(20, 184, 166, 0.08) 0%, transparent 60%);
+  animation: gradientShift 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes gradientShift {
+  0%   { transform: translate(0%, 0%) rotate(0deg); }
+  33%  { transform: translate(3%, -2%) rotate(1deg); }
+  66%  { transform: translate(-2%, 3%) rotate(-1deg); }
+  100% { transform: translate(2%, 2%) rotate(0.5deg); }
+}
+
+/* ============================================================================
+   Grid mesh background (decorative)
+   ============================================================================ */
+.mesh-bg {
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ============================================================================
+   Glow effects
+   ============================================================================ */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3),
+              0 0 60px rgba(99, 102, 241, 0.1);
+}
+
+.glow-text {
+  text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+}
+
+/* ============================================================================
+   Sync pulse animation
+   ============================================================================ */
+@keyframes syncPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.85); }
+}
+
+@keyframes connectedPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+}
+
+.sync-dot-syncing {
+  animation: syncPulse 1.2s ease-in-out infinite;
+}
+
+.sync-dot-connected {
+  animation: connectedPulse 2.5s ease-in-out infinite;
+}
+
+/* ============================================================================
+   Nav active indicator slide animation
+   ============================================================================ */
+@keyframes slideIn {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+/* ============================================================================
+   Page transition wrapper
+   ============================================================================ */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--lexora-duration-normal) var(--lexora-ease-out),
+              transform var(--lexora-duration-normal) var(--lexora-ease-out);
+}
+
+/* ============================================================================
+   Skeleton loader
+   ============================================================================ */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--lexora-bg-elevated) 25%,
+    var(--lexora-bg-overlay) 50%,
+    var(--lexora-bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--lexora-radius-sm);
+}
+
+/* ============================================================================
+   Typography helpers
+   ============================================================================ */
+.text-gradient {
+  background: linear-gradient(135deg, var(--lexora-primary-300), var(--lexora-accent-300));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mono {
+  font-family: var(--lexora-font-mono);
+  font-feature-settings: 'calt' 1, 'liga' 1;
+}
